@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TPO
+  RECRUITER
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  INTERVIEW
+  OFFERED
+  REJECTED
+}
+
+model User {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  email          String        @unique
+  password       String
+  name           String
+  role           Role          @default(STUDENT)
+  isVerified     Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  studentProfile StudentProfile?
+  company        Company?      @relation(fields: [companyId], references: [id])
+  companyId      String?       @db.ObjectId
+  applications   Application[]
+}
+
+model StudentProfile {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  contactNumber     String?
+  resumeUrl         String?
+  profilePictureUrl String?
+  course            String?
+  branch            String?
+  yearOfPassing     Int?
+  cgpa              Float?
+  tenthPercentage   Float?
+  twelfthPercentage Float?
+  activeBacklogs    Int      @default(0)
+  skills            String[]
+  projects          Json?
+  internships       Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String   @unique @db.ObjectId
+}
+
+model Company {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  website     String?
+  logoUrl     String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  recruiters  User[]
+  jobs        Job[]
+}
+
+model Job {
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  description         String
+  ctc                 Float?
+  location            String?
+  role                String?
+  applyBy             DateTime?
+  postedOn            DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  eligibilityCriteria Json?
+  company             Company       @relation(fields: [companyId], references: [id])
+  companyId           String        @db.ObjectId
+  applications        Application[]
+}
+
+model Application {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  status    ApplicationStatus @default(APPLIED)
+  appliedOn DateTime          @default(now())
+  updatedOn DateTime          @updatedAt
+  student   User              @relation(fields: [studentId], references: [id])
+  studentId String            @db.ObjectId
+  job       Job               @relation(fields: [jobId], references: [id])
+  jobId     String            @db.ObjectId
+
+  @@unique([studentId, jobId])
+}

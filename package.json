@@ -1,0 +1,19 @@
+{
+  "name": "hirehub",
+  "version": "1.0.0",
+  "description": "HireHub is a modern, full-stack web application designed to digitalize and streamline the campus placement process. It connects students, the college's Training & Placement Office (TPO), and company recruiters on a single, efficient platform.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node prisma/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.16.1",
+    "bcryptjs": "^3.0.2",
+    "prisma": "^6.16.1"
+  },
+  "devDependencies": {}
+}
